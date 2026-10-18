@@ -98,6 +98,21 @@ mirror:
           defaultChannel: stable
           channels:
             - name: stable
+        # PostgreSQL for maas-api, which will not start without a database:
+        #   failed to load database URL: failed to read secret
+        #   redhat-ai-gateway-infra/maas-db-config: secrets "maas-db-config" not found
+        # The pod CrashLoopBackOffs and the gateway answers authenticated
+        # requests with "no healthy upstream", so it reads as a gateway fault
+        # rather than a missing dependency.
+        #
+        # Mirror this for a disconnected or on-premise install, where a managed
+        # database service is not an option. On a cloud provider an external
+        # managed instance — RDS, Cloud SQL, IBM Cloud Databases — is the better
+        # answer and needs nothing mirrored.
+        - name: crunchy-postgres-operator
+          defaultChannel: v5
+          channels:
+            - name: v5
 
   # Images not discoverable through operator bundles' relatedImages.
   # Modelcar images, the PostgreSQL database, vLLM runtime, WASM shim and simulator.
